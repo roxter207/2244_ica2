@@ -1,4 +1,5 @@
 pipeline {
+    agent any // Specifies the pipeline can run on any available agent
     stages {
         stage('Cleanup') {
             steps {
@@ -38,7 +39,5 @@ pipeline {
                 }
             }
         }
-
-        
     }
 }
