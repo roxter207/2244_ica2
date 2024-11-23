@@ -7,37 +7,39 @@ pipeline {
             }
         }
 
-        stage('Clone Git Repo') {
+        stage('Clone Repository') {
             steps {
                 checkout scm
             }
         }
-    
-        stage('Build and run docker image') {
-            steps {
-                sh 'docker build -t snehakaimal27/2244_ica2:latest .'
-                sh "docker tag snehakaimal27/2244_ica2:latest roxter207/2244_ica2:develop-${env.BUILD_ID}" 
-                sh 'docker run -d -p 8081:80 snehakaimal27/2244_ica2:latest'
-            } 
-        }
 
-        stage('Build and Push') {
+        stage('Build and Run Docker Image') {
             steps {
-                echo 'Building..'
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub-auth', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh '''
-                            docker login -u ${USERNAME} -p ${PASSWORD}
-                            docker push snehakaimal27/2244_ica2:latest
-                        '''
-                        sh "docker push snehakaimal27/2244_ica2:develop-${env.BUILD_ID}"
-                    }
+                sh 'docker stop dev-container || true && docker rm dev-container || true'
+                sh 'docker build -t snehakaimal27/2244_ica2 .'
+                sh "docker tag snehakaimal27/2244_ica2 snehakaimal27/2244_ica2:develop-${env.BUILD_ID}"
+                sh 'docker run -d --name dev-container -p 8081:80 snehakaimal27/2244_ica2'
             }
         }
 
-        stage('testing') {
+        stage('Test Container') {
             steps {
-                sh 'curl -I 192.168.142.1:8081'
+                sh 'curl -I http://localhost:8081'
             }
         }
+
+        stage('Push Image to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-auth', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh 
+                        'docker login -u ${USERNAME} -p ${PASSWORD}'
+                        'docker push snehakaimal27/2244_ica2'
+                        "docker push snehakaimal27/2244_ica2:develop-${env.BUILD_ID}"
+                    
+                }
+            }
+        }
+
+        
     }
 }
