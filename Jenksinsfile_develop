@@ -21,7 +21,6 @@ pipeline {
             } 
         }
 
-
         stage('Build and Push') {
             steps {
                 echo 'Building..'
