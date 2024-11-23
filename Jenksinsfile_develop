@@ -12,17 +12,12 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Clone from repository') {
-            steps {
-                git url: 'https://github.com/roxter207/2244_ica2.git', branch: 'develop', credentialsId: 'GIT'
-            }
-        }
-
+    
         stage('Build and run docker image') {
             steps {
-                sh 'sudo docker build -t roxter207/devops_exam2:latest .'
-                sh "sudo docker tag roxter207/devops_exam2:latest roxter207/devops_exam2:develop-${env.BUILD_ID}" 
-                sh 'sudo docker run -d -p 8081:80 roxter207/devops_exam2:latest'
+                sh 'sudo docker build -t snehakaimal27/2244_ica2:latest .'
+                sh "sudo docker tag snehakaimal27/2244_ica2:latest roxter207/2244_ica2:develop-${env.BUILD_ID}" 
+                sh 'sudo docker run -d -p 8081:80 snehakaimal27/2244_ica2:latest'
             } 
         }
 
@@ -33,9 +28,9 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub-auth', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh '''
                             sudo docker login -u ${USERNAME} -p ${PASSWORD}
-                            sudo docker push roxter207/devops_exam2:latest
+                            sudo docker push snehakaimal27/2244_ica2:latest
                         '''
-                        sh "sudo docker push roxter207/devops_exam2:develop-${env.BUILD_ID}"
+                        sh "sudo docker push snehakaimal27/2244_ica2:develop-${env.BUILD_ID}"
                     }
             }
         }
