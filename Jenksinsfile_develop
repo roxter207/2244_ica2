@@ -15,9 +15,9 @@ pipeline {
     
         stage('Build and run docker image') {
             steps {
-                sh 'sudo docker build -t snehakaimal27/2244_ica2:latest .'
-                sh "sudo docker tag snehakaimal27/2244_ica2:latest roxter207/2244_ica2:develop-${env.BUILD_ID}" 
-                sh 'sudo docker run -d -p 8081:80 snehakaimal27/2244_ica2:latest'
+                sh 'docker build -t snehakaimal27/2244_ica2:latest .'
+                sh "docker tag snehakaimal27/2244_ica2:latest roxter207/2244_ica2:develop-${env.BUILD_ID}" 
+                sh 'docker run -d -p 8081:80 snehakaimal27/2244_ica2:latest'
             } 
         }
 
@@ -27,10 +27,10 @@ pipeline {
                 echo 'Building..'
                     withCredentials([usernamePassword(credentialsId: 'dockerhub-auth', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh '''
-                            sudo docker login -u ${USERNAME} -p ${PASSWORD}
-                            sudo docker push snehakaimal27/2244_ica2:latest
+                            docker login -u ${USERNAME} -p ${PASSWORD}
+                            docker push snehakaimal27/2244_ica2:latest
                         '''
-                        sh "sudo docker push snehakaimal27/2244_ica2:develop-${env.BUILD_ID}"
+                        sh "docker push snehakaimal27/2244_ica2:develop-${env.BUILD_ID}"
                     }
             }
         }
