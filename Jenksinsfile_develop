@@ -12,45 +12,40 @@ pipeline {
                 checkout scm
             }
         }
-
-        stage('Listing files') {
+        stage('Clone from repository') {
             steps {
-                sh 'ls -l'
+                git url: 'https://github.com/roxter207/2244_ica2.git', branch: 'develop', credentialsId: 'GIT'
             }
         }
 
-        stage('Test Before Build') {
+        stage('Build and run docker image') {
             steps {
-                sh 'curl -I http://localhost:8081 || true' // Test to ensure no conflict on port 8081
-            }
+                sh 'sudo docker build -t roxter207/devops_exam2:latest .'
+                sh "sudo docker tag roxter207/devops_exam2:latest roxter207/devops_exam2:develop-${env.BUILD_ID}" 
+                sh 'sudo docker run -d -p 8081:80 roxter207/devops_exam2:latest'
+            } 
         }
+
 
         stage('Build and Push') {
             steps {
-                echo 'Building and Pushing Docker Image...'
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-auth', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh '''
-                        docker build -t roxter207/static-website:latest .
-                        docker login -u ${USERNAME} -p ${PASSWORD}
-                        docker push roxter207/static-website:latest
-                    '''
-                }
+                echo 'Building..'
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-auth', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh '''
+                            sudo docker login -u ${USERNAME} -p ${PASSWORD}
+                            sudo docker push roxter207/devops_exam2:latest
+                        '''
+                        sh "sudo docker push roxter207/devops_exam2:develop-${env.BUILD_ID}"
+                    }
             }
         }
 
-        stage('Deploy Container') {
+        stage('testing') {
             steps {
-                echo "Deploying Docker Container..."
-                sh 'docker stop dev-container || true && docker rm dev-container || true'
-                sh 'docker run --name dev-container -d -p 8081:80 roxter207/static-website:latest'
+                sh 'curl -I 192.168.142.1:8081'
             }
         }
 
-        stage('Test Container') {
-            steps {
-                echo "Testing deployed container..."
-                sh 'curl -I http://localhost:8081'
-            }
-        }
+    
     }
 }
