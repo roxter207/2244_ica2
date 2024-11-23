@@ -31,11 +31,11 @@ pipeline {
         stage('Push Image to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-auth', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh '''
-                        docker login -u ${USERNAME} -p ${PASSWORD}
-                        docker push snehakaimal27/2244_ica2
-                        docker push snehakaimal27/2244_ica2:develop-${env.BUILD_ID}
-                    '''
+                    sh 
+                        'docker login -u ${USERNAME} -p ${PASSWORD}'
+                        'docker push snehakaimal27/2244_ica2'
+                        "docker push snehakaimal27/2244_ica2:develop-${env.BUILD_ID}"
+                    
                 }
             }
         }
