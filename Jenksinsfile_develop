@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+    stages {
+        stage('Cleanup') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Clone Git Repo') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Listing files') {
+            steps {
+                sh 'ls -l'
+            }
+        }
+
+        stage('Test Before Build') {
+            steps {
+                sh 'curl -I http://localhost:8081 || true' // Test to ensure no conflict on port 8081
+            }
+        }
+
+        stage('Build and Push') {
+            steps {
+                echo 'Building and Pushing Docker Image...'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-auth', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh '''
+                        docker build -t roxter207/static-website:latest .
+                        docker login -u ${USERNAME} -p ${PASSWORD}
+                        docker push roxter207/static-website:latest
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy Container') {
+            steps {
+                echo "Deploying Docker Container..."
+                sh 'docker stop dev-container || true && docker rm dev-container || true'
+                sh 'docker run --name dev-container -d -p 8081:80 roxter207/static-website:latest'
+            }
+        }
+
+        stage('Test Container') {
+            steps {
+                echo "Testing deployed container..."
+                sh 'curl -I http://localhost:8081'
+            }
+        }
+    }
+}
