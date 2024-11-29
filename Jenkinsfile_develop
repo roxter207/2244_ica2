@@ -24,7 +24,7 @@ pipeline {
 
         stage('Test Container') {
             steps {
-                sh 'curl -I http://13.61.27.65:8081'
+                sh 'curl -I http://192.168.80.133:8081'
             }
         }
 
