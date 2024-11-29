@@ -33,7 +33,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-auth', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     sh 'docker login -u ${USERNAME} -p ${PASSWORD}'
                     sh 'docker push snehakaimal27/2244_ica2'
-                    sh 'docker push snehakaimal27/2244_ica2:develop-debug'                    
+                    sh 'docker push snehakaimal27/2244_ica2:develop-${env.BUILD_ID}'                    
                 }
             }
         }
