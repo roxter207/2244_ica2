@@ -3,13 +3,13 @@ pipeline {
     stages {
         stage('Build and run docker image') {
             steps {
-                sh 'sudo docker pull snehakaimal27/devops_exam2:latest'
-                sh 'sudo docker run -d -p 8082:80 snehakaimal27/devops_exam2:latest'
+                sh 'sudo docker pull snehakaimal27/2244_ica2:latest'
+                sh 'sudo docker run -d -p 8082:80 snehakaimal27/2244_ica2:latest'
             } 
         }
         stage('testing') {
             steps {
-                sh 'curl -I 192.168.219.163:8082'
+                sh 'curl -I 192.168.80.133:8082'
             }
         }
     }
