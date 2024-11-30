@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Build and run docker image') {
             steps {
-                sh 'docker stop snehakaimal27/2244_ica2:latest || true && docker rm snehakaimal27/2244_ica2:latest || true'
+                sh 'docker stop dev-container || true && docker rm dev-container || true'
                 sh 'sudo docker pull snehakaimal27/2244_ica2:latest'
                 sh 'sudo docker run -d -p 8084:80 snehakaimal27/2244_ica2:latest'
             } 
